@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reaction Time Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #dae2f8, #d6a4a4);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #game-area {
+      width: 300px;
+      height: 300px;
+      background: #ffffffdd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 2px solid #333;
+      font-size: 1.8rem;
+      color: #333;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: background 0.3s ease;
+    }
+
+    #game-area:hover {
+      background: #ffffff;
+    }
+
+    #buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #start-button {
+      background: #007bff;
+      color: white;
+    }
+
+    #start-button:hover {
+      background: #0056cc;
+    }
+
+    #retry-button {
+      background: #6c757d;
+      color: white;
+    }
+
+    #retry-button:hover {
+      background: #55595c;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+      text-align: center;
+      min-height: 1.5em; /* to keep space even when empty */
+    }
+  </style>
+</head>
+<body>
+  <h1>Reaction Time Game</h1>
+  <div id="game-area">Click "Start" to begin</div>
+
+  <div id="buttons">
+    <button id="start-button">Start</button>
+    <button id="retry-button" style="display: none;">Retry</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const gameArea = document.getElementById('game-area');
+    const startButton = document.getElementById('start-button');
+    const retryButton = document.getElementById('retry-button');
+    const resultDiv = document.getElementById('result');
+
+    let startTime = 0;
+    let timeoutId = null;
+    let gameActive = false;
+
+    // Helper function to reset game state
+    function resetGame() {
+      gameArea.textContent = 'Click "Start" to begin';
+      resultDiv.textContent = '';
+      gameActive = false;
+      startTime = 0;
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+
+    // When the user clicks/touches the game area
+    gameArea.addEventListener('click', () => {
+      // If the game is active and the "[Touch!]" prompt is displayed
+      if (gameActive) {
+        const endTime = performance.now();
+        const reactionTime = endTime - startTime;
+        gameActive = false;
+        gameArea.textContent = 'Well done!';
+        resultDiv.textContent = `Your reaction time: ${reactionTime.toFixed(2)} ms`;
+        retryButton.style.display = 'inline-block';
+      }
+    });
+
+    // Start button logic
+    startButton.addEventListener('click', () => {
+      resetGame();
+      startButton.style.display = 'none';
+      retryButton.style.display = 'none';
+      resultDiv.textContent = 'Wait for [Touch!]...';
+
+      // Wait for a random delay (1-3 seconds), then show the prompt
+      const randomDelay = Math.floor(Math.random() * 2000) + 1000; // 1000-3000 ms
+      timeoutId = setTimeout(() => {
+        gameArea.textContent = '[Touch!]';
+        gameActive = true;
+        startTime = performance.now();
+      }, randomDelay);
+    });
+
+    // Retry button logic
+    retryButton.addEventListener('click', () => {
+      resetGame();
+      startButton.style.display = 'inline-block';
+      retryButton.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
